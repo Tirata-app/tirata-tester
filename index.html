@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tirata — Program Preview</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Tirata · Program Preview</h1>
+    <p class="sub">Generates a full program through the live production engine, then renders it to read as a whole.</p>
+  </header>
+
+  <main>
+    <!-- Login -->
+    <section id="login" class="card hidden">
+      <h2>Sign in</h2>
+      <p class="hint">Uses the shared review account. Ask Charlie for the password.</p>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" />
+      </div>
+      <button id="signin-btn" class="primary">Sign in</button>
+      <p id="login-error" class="error"></p>
+    </section>
+
+    <!-- Generator -->
+    <section id="generator" class="card hidden">
+      <div class="row between">
+        <h2>Build a sample program</h2>
+        <button id="signout-btn" class="ghost">Sign out</button>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="experience">Experience</label>
+          <select id="experience">
+            <option value="advanced">Advanced</option>
+            <option value="intermediate">Intermediate</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="status">Training status</label>
+          <select id="status">
+            <option value="current">Current</option>
+            <option value="recent">Recent</option>
+            <option value="long">Long layoff</option>
+            <option value="never">Never</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="discipline">Discipline</label>
+          <select id="discipline">
+            <option value="road">Road</option>
+            <option value="gravel">Gravel</option>
+            <option value="mtb">MTB</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="equipment">Equipment</label>
+          <select id="equipment">
+            <option value="full">Full gym</option>
+            <option value="minimalist">Minimalist</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="volume">Volume</label>
+          <select id="volume">
+            <option value="standard">Standard (7)</option>
+            <option value="low">Low (5)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="frequency">Strength / week</label>
+          <select id="frequency">
+            <option value="3">3</option>
+            <option value="2">2</option>
+            <option value="1">1</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="weeks">Length (weeks)</label>
+          <input id="weeks" type="number" min="3" max="32" value="16" />
+        </div>
+        <div class="field">
+          <label for="age">Age group</label>
+          <select id="age">
+            <option value="none">—</option>
+            <option value="30_39">30–39</option>
+            <option value="40_49">40–49</option>
+            <option value="50_59">50–59</option>
+            <option value="60_69">60–69</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="random-btn" class="ghost">Randomize</button>
+        <button id="generate-btn" class="primary">Generate program</button>
+      </div>
+      <p class="hint">Rides default to Tue/intervals, Thu/easy, Sat/long. Start date is the next Monday.</p>
+      <p id="status" class="status"></p>
+    </section>
+
+    <!-- Result -->
+    <section id="result" class="card result hidden"></section>
+  </main>
+
+  <!-- supabase-js (UMD global `supabase`), pinned + Subresource Integrity -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.101.1/dist/umd/supabase.js"
+    integrity="sha384-twhroNxtNM6hcaxZmvhUjI6o++BofLKrqnQUwkHK9NiXpq/WqaBWISkN0uvB6Bc7"
+    crossorigin="anonymous"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
