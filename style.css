@@ -28,6 +28,8 @@ header {
 }
 header h1 { margin: 0; font-size: 22px; letter-spacing: 0.2px; }
 header .sub { margin: 4px 0 0; color: var(--muted); }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand .logo { width: 46px; height: 46px; object-fit: contain; flex: none; }
 
 main {
   max-width: 980px;
