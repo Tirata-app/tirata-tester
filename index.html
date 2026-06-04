@@ -45,17 +45,16 @@
         <div class="field">
           <label for="experience">Experience</label>
           <select id="experience">
-            <option value="advanced">Advanced</option>
             <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
           </select>
         </div>
         <div class="field">
           <label for="status">Training status</label>
           <select id="status">
-            <option value="current">Current</option>
-            <option value="recent">Recent</option>
-            <option value="long">Long layoff</option>
-            <option value="never">Never</option>
+            <option value="current">Currently training</option>
+            <option value="recent">Recently stopped</option>
+            <option value="long">Long break</option>
           </select>
         </div>
         <div class="field">
@@ -74,41 +73,54 @@
           </select>
         </div>
         <div class="field">
-          <label for="volume">Volume</label>
+          <label for="volume">Time availability</label>
           <select id="volume">
-            <option value="standard">Standard (7)</option>
-            <option value="low">Low (5)</option>
+            <option value="standard">45–60 min · standard (7)</option>
+            <option value="low">20–45 min · low (5)</option>
           </select>
         </div>
         <div class="field">
           <label for="frequency">Strength / week</label>
           <select id="frequency">
-            <option value="3">3</option>
-            <option value="2">2</option>
-            <option value="1">1</option>
+            <option value="3">3×</option>
+            <option value="2">2×</option>
+            <option value="1">1×</option>
           </select>
-        </div>
-        <div class="field">
-          <label for="weeks">Length (weeks)</label>
-          <input id="weeks" type="number" min="3" max="32" value="16" />
         </div>
         <div class="field">
           <label for="age">Age group</label>
           <select id="age">
-            <option value="none">—</option>
+            <option value="18_29">18–29</option>
             <option value="30_39">30–39</option>
             <option value="40_49">40–49</option>
             <option value="50_59">50–59</option>
             <option value="60_69">60–69</option>
+            <option value="70_plus">70+</option>
           </select>
         </div>
+        <div class="field">
+          <label for="startdate">Start date</label>
+          <select id="startdate">
+            <option value="next_monday">Next Monday</option>
+            <option value="today">Today</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="weeks">Weeks to A-race</label>
+          <input id="weeks" type="number" min="3" max="32" value="16" />
+        </div>
+      </div>
+
+      <div class="rides">
+        <label class="block-label">Weekly rides <span class="block-hint">(at least one)</span></label>
+        <div class="ride-grid" id="ride-grid"></div>
       </div>
 
       <div class="row">
         <button id="random-btn" class="ghost">Randomize</button>
         <button id="generate-btn" class="primary">Generate program</button>
       </div>
-      <p class="hint">Rides default to Tue/intervals, Thu/easy, Sat/long. Start date is the next Monday.</p>
+      <p class="hint">Every field is required, mirroring onboarding. Strength days are placed by the engine (the placement logic currently under review).</p>
       <p id="status" class="status"></p>
     </section>
 

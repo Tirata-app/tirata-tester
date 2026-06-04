@@ -29,7 +29,7 @@ header {
 header h1 { margin: 0; font-size: 22px; letter-spacing: 0.2px; }
 header .sub { margin: 4px 0 0; color: var(--muted); }
 .brand { display: flex; align-items: center; gap: 14px; }
-.brand .logo { width: 46px; height: 46px; object-fit: contain; flex: none; }
+.brand .logo { width: 10px; height: 10px; object-fit: contain; flex: none; }
 
 main {
   max-width: 980px;
@@ -58,6 +58,15 @@ main {
 
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.rides { margin: 6px 0 10px; }
+.block-label { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.block-hint { text-transform: none; letter-spacing: 0; opacity: 0.8; }
+.ride-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+@media (max-width: 720px) { .ride-grid { grid-template-columns: repeat(4, 1fr); } }
+.ride-cell { display: flex; flex-direction: column; gap: 4px; }
+.ride-day { font-size: 12px; color: var(--muted); text-align: center; }
+.ride-cell select { padding: 7px 6px; font-size: 13px; }
 
 input, select {
   background: var(--card-2);

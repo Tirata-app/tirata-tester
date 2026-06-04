@@ -23,6 +23,13 @@ const EQUIPMENT = {
   minimalist: ["dumbbell", "kettlebell", "band", "bench", "pull_up_bar"],
 };
 const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// Onboarding option sets (exact values the app sends to generate-program).
+const RIDE_DAYS = [["mon", "Mon"], ["tue", "Tue"], ["wed", "Wed"], ["thu", "Thu"], ["fri", "Fri"], ["sat", "Sat"], ["sun", "Sun"]];
+const RIDE_TYPES = [["rest", "Rest"], ["easy", "Easy"], ["intervals", "Intervals"], ["long", "Long"]];
+const AGE_GROUPS = ["18_29", "30_39", "40_49", "50_59", "60_69", "70_plus"];
+// Canonical session types per frequency (FrequencyScreen).
+const SESSION_TYPES_BY_FREQ = { 1: ["session_a"], 2: ["session_a", "session_b"], 3: ["session_a", "session_b", "core"] };
+const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // --- date helpers (UTC, no locale surprises) ---------------------------------
 function isoAddDays(iso, days) {
@@ -30,20 +37,59 @@ function isoAddDays(iso, days) {
   const dt = new Date(Date.UTC(y, m - 1, d) + days * 86400000);
   return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, "0")}-${String(dt.getUTCDate()).padStart(2, "0")}`;
 }
-function nextMonday() {
+function todayISO() {
   const now = new Date();
-  const today = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+}
+function nextMonday() {
+  const today = todayISO();
   const dow = (new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7; // 0=Mon
   return isoAddDays(today, dow === 0 ? 0 : 7 - dow);
 }
 function weekday(iso) { return DOW[(new Date(`${iso}T00:00:00Z`).getUTCDay() + 6) % 7]; }
 
+// --- ride schedule control (7-day grid) --------------------------------------
+function buildRideGrid() {
+  const grid = $("ride-grid");
+  grid.innerHTML = "";
+  for (const [val, label] of RIDE_DAYS) {
+    const cell = el("div", "ride-cell");
+    const opts = RIDE_TYPES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+    cell.innerHTML = `<span class="ride-day">${label}</span><select id="ride-${val}">${opts}</select>`;
+    grid.appendChild(cell);
+  }
+  setRides([{ day: "tue", type: "intervals" }, { day: "thu", type: "easy" }, { day: "sat", type: "long" }]);
+}
+function setRides(rides) {
+  for (const [val] of RIDE_DAYS) { const s = $(`ride-${val}`); if (s) s.value = "rest"; }
+  for (const r of rides) { const s = $(`ride-${r.day}`); if (s) s.value = r.type; }
+}
+function readRides() {
+  const out = [];
+  for (const [val] of RIDE_DAYS) {
+    const t = $(`ride-${val}`).value;
+    if (t !== "rest") out.push({ day: val, type: t });
+  }
+  return out;
+}
+function randomizeRides() {
+  const days = RIDE_DAYS.map(([v]) => v).sort(() => Math.random() - 0.5);
+  const chosen = days.slice(0, 2 + Math.floor(Math.random() * 3)); // 2..4 ride days
+  let usedLong = false;
+  setRides(chosen.map((day) => {
+    let type = rand(["easy", "intervals", "long"]);
+    if (type === "long" && usedLong) type = "intervals";
+    if (type === "long") usedLong = true;
+    return { day, type };
+  }));
+}
+
 // --- profile from the form ---------------------------------------------------
 function readProfile() {
   const tier = $("equipment").value;
   const weeks = Math.max(3, Math.min(32, parseInt($("weeks").value, 10) || 16));
-  const startDate = nextMonday();
-  const age = $("age").value;
+  const startDate = $("startdate").value === "today" ? todayISO() : nextMonday();
+  const frequency = parseInt($("frequency").value, 10);
   return {
     startDate,
     aRaceDate: isoAddDays(startDate, weeks * 7 - 2),
@@ -52,28 +98,26 @@ function readProfile() {
     trainingStatus: $("status").value,
     equipment: EQUIPMENT[tier],
     volume: $("volume").value,
-    frequency: parseInt($("frequency").value, 10),
-    rideSchedule: [
-      { day: "tue", type: "intervals" },
-      { day: "thu", type: "easy" },
-      { day: "sat", type: "long" },
-    ],
-    ageGroup: age === "none" ? undefined : age,
+    frequency,
+    sessionTypes: SESSION_TYPES_BY_FREQ[frequency],
+    rideSchedule: readRides(),
+    ageGroup: $("age").value, // always set — required, like onboarding
     _weeks: weeks,
     _tier: tier,
   };
 }
 
 function randomize() {
-  const r = (arr) => arr[Math.floor(Math.random() * arr.length)];
-  $("experience").value = r(["advanced", "intermediate"]);
-  $("status").value = r(["current", "recent", "long", "never"]);
-  $("discipline").value = r(["road", "gravel", "mtb"]);
-  $("equipment").value = r(["full", "minimalist"]);
-  $("volume").value = r(["standard", "low"]);
-  $("frequency").value = r(["3", "2"]);
-  $("weeks").value = String(6 + Math.floor(Math.random() * 22));
-  $("age").value = r(["none", "none", "40_49", "50_59", "60_69"]);
+  $("experience").value = rand(["intermediate", "advanced"]);
+  $("status").value = rand(["current", "recent", "long"]);
+  $("discipline").value = rand(["road", "gravel", "mtb"]);
+  $("equipment").value = rand(["full", "minimalist"]);
+  $("volume").value = rand(["standard", "low"]);
+  $("frequency").value = rand(["1", "2", "3"]);
+  $("age").value = rand(AGE_GROUPS);
+  $("startdate").value = rand(["next_monday", "today"]);
+  $("weeks").value = String(8 + Math.floor(Math.random() * 17)); // 8..24
+  randomizeRides();
 }
 
 // --- read the written program back via RLS -----------------------------------
@@ -173,6 +217,7 @@ async function selfClean(uid) {
 // --- generate flow -----------------------------------------------------------
 async function generate() {
   const profile = readProfile();
+  if (profile.rideSchedule.length === 0) { setStatus("Add at least one ride day (onboarding requires one).", "fail"); return; }
   const { data: sess } = await db.auth.getSession();
   const uid = sess.session?.user?.id;
   if (!uid) { setStatus("Not signed in.", "fail"); showLoginState(); return; }
@@ -240,4 +285,5 @@ $("password").addEventListener("keydown", (e) => { if (e.key === "Enter") signIn
 $("signout-btn").addEventListener("click", signOut);
 $("generate-btn").addEventListener("click", generate);
 $("random-btn").addEventListener("click", randomize);
+buildRideGrid();
 showLoginState();
