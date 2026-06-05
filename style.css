@@ -67,6 +67,8 @@ main {
 .ride-cell { display: flex; flex-direction: column; gap: 4px; }
 .ride-day { font-size: 12px; color: var(--muted); text-align: center; }
 .ride-cell select { padding: 7px 6px; font-size: 13px; }
+.brace-row { display: flex; gap: 12px; }
+.brace-row input { width: 130px; }
 
 input, select {
   background: var(--card-2);

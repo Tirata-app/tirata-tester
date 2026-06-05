@@ -85,11 +85,25 @@ function randomizeRides() {
 }
 
 // --- profile from the form ---------------------------------------------------
+// B-races: optional week numbers → Saturday-of-that-week dates (before the A-race).
+function readBRaces(weeks, startDate) {
+  const dates = [], names = [];
+  [["brace1", "B-race 1"], ["brace2", "B-race 2"]].forEach(([id, name]) => {
+    const n = parseInt($(id).value, 10);
+    if (Number.isFinite(n) && n >= 2 && n < weeks) {
+      dates.push(isoAddDays(startDate, (n - 1) * 7 + 5)); // Saturday of week n
+      names.push(name);
+    }
+  });
+  return { dates, names };
+}
+
 function readProfile() {
   const tier = $("equipment").value;
   const weeks = Math.max(3, Math.min(32, parseInt($("weeks").value, 10) || 16));
   const startDate = $("startdate").value === "today" ? todayISO() : nextMonday();
   const frequency = parseInt($("frequency").value, 10);
+  const { dates: bRaceDates, names: bRaceNames } = readBRaces(weeks, startDate);
   return {
     startDate,
     aRaceDate: isoAddDays(startDate, weeks * 7 - 2),
@@ -101,6 +115,8 @@ function readProfile() {
     frequency,
     sessionTypes: SESSION_TYPES_BY_FREQ[frequency],
     rideSchedule: readRides(),
+    bRaceDates,
+    bRaceNames,
     ageGroup: $("age").value, // always set — required, like onboarding
     _weeks: weeks,
     _tier: tier,
@@ -116,8 +132,23 @@ function randomize() {
   $("frequency").value = rand(["1", "2", "3"]);
   $("age").value = rand(AGE_GROUPS);
   $("startdate").value = rand(["next_monday", "today"]);
-  $("weeks").value = String(8 + Math.floor(Math.random() * 17)); // 8..24
+  const weeks = 8 + Math.floor(Math.random() * 17); // 8..24
+  $("weeks").value = String(weeks);
   randomizeRides();
+  randomizeBRaces(weeks);
+}
+
+// 0–2 B-races at random weeks before the A-race.
+function randomizeBRaces(weeks) {
+  $("brace1").value = ""; $("brace2").value = "";
+  if (weeks < 6) return;
+  const count = Math.floor(Math.random() * 3); // 0..2
+  const picks = [];
+  while (picks.length < count) {
+    const wk = 3 + Math.floor(Math.random() * (weeks - 4)); // 3..weeks-2
+    if (!picks.includes(wk)) picks.push(wk);
+  }
+  picks.sort((a, b) => a - b).forEach((wk, i) => { $(`brace${i + 1}`).value = String(wk); });
 }
 
 // --- read the written program back via RLS -----------------------------------
