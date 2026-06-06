@@ -27,8 +27,9 @@ const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const RIDE_DAYS = [["mon", "Mon"], ["tue", "Tue"], ["wed", "Wed"], ["thu", "Thu"], ["fri", "Fri"], ["sat", "Sat"], ["sun", "Sun"]];
 const RIDE_TYPES = [["rest", "Rest"], ["easy", "Easy"], ["intervals", "Intervals"], ["long", "Long"]];
 const AGE_GROUPS = ["18_29", "30_39", "40_49", "50_59", "60_69", "70_plus"];
-// Canonical session types per frequency (FrequencyScreen).
-const SESSION_TYPES_BY_FREQ = { 1: ["session_a"], 2: ["session_a", "session_b"], 3: ["session_a", "session_b", "core"] };
+// Canonical session types per frequency. V1 scope: 1x = A, 2x = A+B (standalone
+// Core session dropped/dormant — see project_v1_launch_scope).
+const SESSION_TYPES_BY_FREQ = { 1: ["session_a"], 2: ["session_a", "session_b"] };
 const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // --- date helpers (UTC, no locale surprises) ---------------------------------
@@ -129,7 +130,7 @@ function randomize() {
   $("discipline").value = rand(["road", "gravel", "mtb"]);
   $("equipment").value = rand(["full", "minimalist"]);
   $("volume").value = rand(["standard", "low"]);
-  $("frequency").value = rand(["1", "2", "3"]);
+  $("frequency").value = rand(["1", "2"]);
   $("age").value = rand(AGE_GROUPS);
   $("startdate").value = rand(["next_monday", "today"]);
   const weeks = 8 + Math.floor(Math.random() * 17); // 8..24
