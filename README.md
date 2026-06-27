@@ -25,8 +25,10 @@ this repo**:
   It grants nothing beyond what RLS allows for the signed-in user.
 - The test account's **password is never stored here** — it's typed at login.
 
-Because it calls the real edge function against the live database, the program it
-shows is exactly what a real onboarding produces.
+Because it calls the real edge function, the program it shows is exactly what
+onboarding produces on **staging** — which currently runs the **mux-only** builder
+(only exercises that have a Mux video are selected). Prod is not mux-ready yet, so
+staging is the source while videos are imported.
 
 ## Use it
 
@@ -39,7 +41,7 @@ python3 -m http.server 8080
 ```
 
 Then:
-1. Sign in with the review account (`buildtester@tirata.app`) — ask Charlie for the password.
+1. Sign in with the review account (`tester@tirata.app`, on **staging**) — ask Charlie for the password.
 2. Pick inputs (or hit **Randomize**), then **Generate program**.
 3. Read the rendered program. Rides default to Tue/intervals, Thu/easy, Sat/long;
    start date is the next Monday.
@@ -57,8 +59,8 @@ The page is publicly reachable — the login is the gate. Keep the test password
 
 ## Notes
 
-- **Test account:** `buildtester@tirata.app` (UUID `18c629c1-394e-414c-b295-5443d44ec89b`).
-  Exclude this `user_id` from any analytics so review runs don't skew study metrics.
+- **Test account:** `tester@tirata.app` on the **staging** project (staging data only —
+  never touches real users or prod analytics).
 - **Self-cleaning:** after each generate, the tool deletes the account's `completed`
   programs (RLS allows a user to delete their own rows), so its DB footprint stays at
   ~1 active program. Real users' data is never touched.
