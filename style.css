@@ -129,3 +129,42 @@ th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size
 td.slot { color: var(--muted); white-space: nowrap; }
 td.rx { white-space: nowrap; }
 tr.warmup td { color: var(--muted); }
+
+/* phase accordion */
+.phase-controls { display: flex; gap: 8px; margin: 12px 0 4px; }
+button.ghost.small { padding: 5px 10px; font-size: 12px; font-weight: 500; }
+
+details.phase {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card-2);
+  margin: 10px 0;
+  overflow: hidden;
+}
+details.phase[open] { background: var(--card); }
+
+.phase-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.phase-summary::-webkit-details-marker { display: none; }
+.phase-summary::before {
+  content: "▸";
+  align-self: center;
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.15s ease;
+}
+details.phase[open] .phase-summary::before { transform: rotate(90deg); }
+.phase-summary:hover { background: rgba(91, 140, 255, 0.06); }
+.phase-summary .phase-code { font-weight: 700; color: var(--accent); font-size: 15px; }
+.phase-summary .phase-range { font-weight: 600; }
+.phase-summary .phase-meta { color: var(--muted); font-size: 13px; margin-right: auto; }
+
+.phase-body { padding: 0 14px 14px; }
+.phase-body .week:first-child { border-top: none; margin-top: 4px; padding-top: 4px; }

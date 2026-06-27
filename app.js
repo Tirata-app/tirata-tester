@@ -194,7 +194,8 @@ function render(profile, data) {
     `${profile.ageGroup ? ` · age ${esc(profile.ageGroup)}` : ""}<br>` +
     `${esc(program.start_date)} → A-race ${esc(profile.aRaceDate)} · ${program.total_weeks} weeks · built by the live production engine`));
 
-  for (const w of weeks) {
+  // Build one week block (header + its sessions + exercise tables).
+  const buildWeek = (w) => {
     const ph = phaseById.get(w.phase_id);
     const startDate = isoAddDays(program.start_date, (w.week_number - 1) * 7);
     const wkSessions = sessByWeek.get(w.id) || [];
@@ -235,8 +236,54 @@ function render(profile, data) {
       table.appendChild(tb);
       week.appendChild(table);
     }
-    root.appendChild(week);
+    return week;
+  };
+
+  // Group weeks into phase segments (chronological), then render each phase as a
+  // clickable <details> dropdown so Matt can open just one phase and read how it's
+  // built instead of scrolling one long list.
+  const segments = [];
+  for (const w of weeks) {
+    const last = segments[segments.length - 1];
+    if (last && last.phaseId === w.phase_id) last.weeks.push(w);
+    else segments.push({ phaseId: w.phase_id, phase: phaseById.get(w.phase_id), weeks: [w] });
   }
+
+  // Expand / collapse all (the accordion gets tall on long programs).
+  const controls = el("div", "phase-controls");
+  const expandBtn = el("button", "ghost small", "Expand all");
+  const collapseBtn = el("button", "ghost small", "Collapse all");
+  controls.appendChild(expandBtn);
+  controls.appendChild(collapseBtn);
+  root.appendChild(controls);
+
+  segments.forEach((seg, idx) => {
+    const ph = seg.phase;
+    const firstWk = seg.weeks[0].week_number;
+    const lastWk = seg.weeks[seg.weeks.length - 1].week_number;
+    const nSessions = seg.weeks.reduce((n, w) => n + (sessByWeek.get(w.id) || []).length, 0);
+    const hasDeload = seg.weeks.some((w) => w.is_deload);
+    const hasRace = seg.weeks.some((w) => w.race_week_type);
+
+    const details = el("details", "phase");
+    if (idx === 0) details.open = true; // first phase open so the result isn't all-collapsed
+    const summary = el("summary", "phase-summary");
+    summary.innerHTML =
+      `<span class="phase-code">${ph ? esc(ph.phase_code) : "?"}</span>` +
+      `<span class="phase-range">Weeks ${firstWk}–${lastWk}</span>` +
+      `<span class="phase-meta">${seg.weeks.length} wk · ${nSessions} session${nSessions === 1 ? "" : "s"}</span>` +
+      (hasDeload ? ` <span class="flag deload">DELOAD</span>` : "") +
+      (hasRace ? ` <span class="flag race">RACE</span>` : "");
+    details.appendChild(summary);
+
+    const body = el("div", "phase-body");
+    for (const w of seg.weeks) body.appendChild(buildWeek(w));
+    details.appendChild(body);
+    root.appendChild(details);
+  });
+
+  expandBtn.addEventListener("click", () => root.querySelectorAll("details.phase").forEach((d) => (d.open = true)));
+  collapseBtn.addEventListener("click", () => root.querySelectorAll("details.phase").forEach((d) => (d.open = false)));
   show("result");
 }
 
